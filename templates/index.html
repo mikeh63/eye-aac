@@ -259,6 +259,68 @@
       min-height: 0;
     }
 
+    /* ── AI PREDICTION BAR ────────────────────────── */
+    .predict-bar {
+      display: flex;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #0d1117;
+      border-bottom: 2px solid var(--border);
+      flex-shrink: 0;
+      align-items: center;
+      min-height: 58px;
+    }
+
+    .predict-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .predict-btn {
+      flex: 1;
+      background: #161b22;
+      border: 2px solid #2a3f5c;
+      border-radius: 8px;
+      padding: 8px 6px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #7ab8ff;
+      cursor: default;
+      text-align: center;
+      transition: all 0.12s;
+      user-select: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .predict-btn.hovered {
+      border-color: var(--accent);
+      background: #1a2f50;
+      color: #fff;
+      box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(88,166,255,0.2);
+      transform: scale(1.04);
+    }
+
+    .predict-btn.activated {
+      border-color: var(--green);
+      background: #152a1e;
+      color: var(--green);
+      transform: scale(0.96);
+    }
+
+    .predict-btn.loading {
+      color: var(--muted);
+      border-color: var(--border);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
     .word-btn {
       background: var(--word-bg);
       border: 2px solid var(--border);
@@ -456,7 +518,16 @@
     <!-- ── WORD BOARD ── -->
     <div class="board">
       <div class="category-tabs" id="category-tabs"></div>
-      <div class="word-grid"     id="word-grid"></div>
+      <div class="predict-bar" id="predict-bar">
+        <span class="predict-label">🤖 AI</span>
+        <div class="predict-btn loading" id="p0">…</div>
+        <div class="predict-btn loading" id="p1">…</div>
+        <div class="predict-btn loading" id="p2">…</div>
+        <div class="predict-btn loading" id="p3">…</div>
+        <div class="predict-btn loading" id="p4">…</div>
+        <div class="predict-btn loading" id="p5">…</div>
+      </div>
+      <div class="word-grid" id="word-grid"></div>
     </div>
 
   </div>
@@ -483,7 +554,7 @@ const CATEGORIES = [
       { text: 'OK',      type: 'quick', add: 'OK' },
       { text: 'Now',     type: 'quick', add: 'Now' },
       { text: 'Not yet', type: 'quick', add: 'Not yet' },
-      { text: 'Help!',   type: 'quick', add: 'Help!' },
+      { text: 'Bullshit',   type: 'quick', add: 'Bullshit' },
     ]
   },
   {
@@ -499,7 +570,9 @@ const CATEGORIES = [
       { text: 'Fuck',         add: 'Fuck' },
       { text: 'Shit',         add: 'Shit' },
       { text: 'Awesome',      add: 'Awesome' },
-      { text: 'Go Illinios!',   add: 'Go Illinios' },
+      { text: 'Classy',       add: 'Classy' },
+      { text: 'No class',     add: 'No class' },
+      { text: 'Go Illinios!', add: 'Go Illinios' },
       { text: 'Truth be told',add: 'Truth be told' },
       { text: 'Tricksy',      add: 'tricksy' },
       { text: 'is a pussy',   add: ' is a pussy' },
@@ -566,12 +639,12 @@ const CATEGORIES = [
     id: 'needs', label: '🏥 Needs',
     words: [
       { text: 'Water',      add: 'Water please' },
-      { text: 'Coffee ☕',     add: 'Coffee please' },
+      { text: 'Coffee',     add: 'Coffee please' },
       { text: 'Food',       add: 'Food please' },
-      { text: 'Bathroom',      add: 'I need the bathroom' },
-      { text: 'Reposition',    add: 'Can you reposition me?' },
-      { text: 'Too hot',       add: "I'm too hot" },
-      { text: 'Too cold',      add: "I'm too cold" },
+      { text: 'Beer',       add: 'Time for a beer'}
+      { text: 'Cocktail',   add: 'Time for a cocktail'}
+      { text: 'Too hot',       add: "Too hot" },
+      { text: 'Too cold',      add: "Too cold" },
       { text: 'Uncomfortable', add: "I'm uncomfortable" },
       { text: 'Medication',    add: 'I need my medication' },
       { text: 'Rest',          add: 'I need to rest' },
@@ -697,6 +770,57 @@ const CATEGORIES = [
       { text: 'food',   add: 'food' },
     ]
   },
+  {
+    id: 'nouns', label: '🌍 Nouns',
+    words: [
+      // People & relationships
+      { text: 'doctor',     add: 'doctor' },
+      { text: 'caregiver',  add: 'caregiver' },
+      { text: 'family',     add: 'family' },
+      { text: 'friend',     add: 'friend' },
+      { text: 'everyone',   add: 'everyone' },
+      // Places
+      { text: 'home',       add: 'home' },
+      { text: 'hospital',   add: 'hospital' },
+      { text: 'Corvallis',  add: 'Corvallis' },
+      { text: 'Oregon',     add: 'Oregon' },
+      { text: 'outside',    add: 'outside' },
+      { text: 'restaurant', add: 'restaurant' },
+      { text: 'coffee shop',add: 'coffee shop' },
+      // Body & health
+      { text: 'hand',       add: 'hand' },
+      { text: 'arm',        add: 'arm' },
+      { text: 'back',       add: 'back' },
+      { text: 'head',       add: 'head' },
+      { text: 'pain',       add: 'pain' },
+      { text: 'medication', add: 'medication' },
+      { text: 'bed',        add: 'bed' },
+      { text: 'chair',      add: 'chair' },
+      // Daily life
+      { text: 'phone',      add: 'phone' },
+      { text: 'computer',   add: 'computer' },
+      { text: 'TV',         add: 'TV' },
+      { text: 'music',      add: 'music' },
+      { text: 'coffee',     add: 'coffee' },
+      { text: 'water',      add: 'water' },
+      { text: 'food',       add: 'food' },
+      { text: 'car',        add: 'car' },
+      // Time
+      { text: 'morning',    add: 'morning' },
+      { text: 'afternoon',  add: 'afternoon' },
+      { text: 'evening',    add: 'evening' },
+      { text: 'night',      add: 'night' },
+      { text: 'tomorrow',   add: 'tomorrow' },
+      { text: 'weekend',    add: 'weekend' },
+      // Jack's world
+      { text: 'Beavers',    add: 'Beavers' },
+      { text: 'game',       add: 'game' },
+      { text: 'robot',      add: 'robot' },
+      { text: 'Thai food',  add: 'Thai food' },
+      { text: 'story',      add: 'story' },
+      { text: 'money',      add: 'money' },
+    ]
+  },
 ];
 
 // ═══════════════════════════════════════════════════
@@ -709,16 +833,19 @@ function addWord(w) {
   words.push(w);
   renderSentence();
   speakWord(w);
+  fetchPredictions();
 }
 
 function removeLastWord() {
   words.pop();
   renderSentence();
+  fetchPredictions();
 }
 
 function clearSentence() {
   words = [];
   renderSentence();
+  resetPredictions();
 }
 
 function renderSentence() {
@@ -741,6 +868,65 @@ function renderSentence() {
 }
 
 function getSentenceText() { return words.join(' '); }
+
+// ═══════════════════════════════════════════════════
+//  AI PREDICTION
+// ═══════════════════════════════════════════════════
+const predictBtns = Array.from({length: 6}, (_, i) => document.getElementById('p' + i));
+let predicting = false;
+let pendingPredict = false;
+
+function resetPredictions() {
+  predictBtns.forEach(btn => {
+    btn.textContent = '…';
+    btn.className = 'predict-btn loading';
+    btn.dataset.add = '';
+  });
+}
+
+function setPredictions(suggestions) {
+  predictBtns.forEach((btn, i) => {
+    const s = suggestions[i] || '';
+    btn.textContent = s;
+    btn.className = 'predict-btn' + (s ? '' : ' loading');
+    btn.dataset.add = s;
+  });
+}
+
+async function fetchPredictions() {
+  const text = getSentenceText();
+  if (!text) { resetPredictions(); return; }
+
+  if (predicting) { pendingPredict = true; return; }
+  predicting = true;
+
+  // Show loading state
+  predictBtns.forEach(btn => {
+    btn.className = 'predict-btn loading';
+    btn.textContent = '…';
+  });
+
+  try {
+    const res = await fetch('/api/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sentence: text })
+    });
+    const data = await res.json();
+    if (data.suggestions) setPredictions(data.suggestions);
+  } catch (e) {
+    predictBtns.forEach(btn => {
+      btn.textContent = '—';
+      btn.className = 'predict-btn loading';
+    });
+  } finally {
+    predicting = false;
+    if (pendingPredict) {
+      pendingPredict = false;
+      fetchPredictions();
+    }
+  }
+}
 
 // ═══════════════════════════════════════════════════
 //  BOARD RENDERING
@@ -785,6 +971,14 @@ document.getElementById('category-tabs').addEventListener('click', e => {
 document.getElementById('word-grid').addEventListener('click', e => {
   const btn = e.target.closest('.word-btn');
   if (!btn) return;
+  addWord(btn.dataset.add);
+  btn.classList.add('activated');
+  setTimeout(() => btn.classList.remove('activated'), 400);
+});
+
+document.getElementById('predict-bar').addEventListener('click', e => {
+  const btn = e.target.closest('.predict-btn');
+  if (!btn || !btn.dataset.add) return;
   addWord(btn.dataset.add);
   btn.classList.add('activated');
   setTimeout(() => btn.classList.remove('activated'), 400);
@@ -938,6 +1132,13 @@ function getHit(px, py) {
     if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
       return { type: 'word', el: btn };
   }
+  // Prediction buttons
+  for (const btn of document.querySelectorAll('.predict-btn')) {
+    if (!btn.dataset.add) continue;
+    const r = btn.getBoundingClientRect();
+    if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
+      return { type: 'predict', el: btn };
+  }
   for (const tab of document.querySelectorAll('.cat-tab')) {
     const r = tab.getBoundingClientRect();
     if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
@@ -974,6 +1175,13 @@ function onBlink(px, py) {
     setTimeout(() => hit.el.classList.remove('activated'), 500);
     addWord(w);
     blinkLog.innerHTML = `Added: <span>${w}</span>`;
+  } else if (hit.type === 'predict') {
+    const w = hit.el.dataset.add;
+    if (!w) return;
+    hit.el.classList.add('activated');
+    setTimeout(() => hit.el.classList.remove('activated'), 500);
+    addWord(w);
+    blinkLog.innerHTML = `AI predicted: <span>${w}</span>`;
   } else if (hit.type === 'tab') {
     activeCategory = hit.el.dataset.catId;
     renderTabs(); renderGrid();
@@ -1038,6 +1246,10 @@ function processResults(results) {
     cursorEl.style.top  = py + 'px';
 
     document.querySelectorAll('.word-btn').forEach(btn => {
+      const r = btn.getBoundingClientRect();
+      btn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
+    });
+    document.querySelectorAll('.predict-btn').forEach(btn => {
       const r = btn.getBoundingClientRect();
       btn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
     });
