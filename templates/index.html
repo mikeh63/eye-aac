@@ -251,7 +251,7 @@
     .word-grid {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 10px;
       padding: 12px;
       overflow-y: auto;
@@ -318,6 +318,22 @@
     }
 
     .word-btn.quick { font-size: 1.7rem; }
+
+    /* Word group colors */
+    .word-btn.grp-pronoun    { border-color: #2a4a7f; background: #141e30; }
+    .word-btn.grp-pronoun.hovered    { border-color: #58a6ff; background: #1a2f50; box-shadow: 0 0 0 1px #58a6ff; }
+    .word-btn.grp-verb       { border-color: #1a5c2a; background: #0f2318; }
+    .word-btn.grp-verb.hovered       { border-color: #3fb950; background: #152a1e; box-shadow: 0 0 0 1px #3fb950; }
+    .word-btn.grp-preposition{ border-color: #4a2a6a; background: #1e1030; }
+    .word-btn.grp-preposition.hovered{ border-color: #b07aff; background: #2d1e4a; box-shadow: 0 0 0 1px #b07aff; }
+    .word-btn.grp-conjunction { border-color: #6a4a00; background: #2a1e00; }
+    .word-btn.grp-conjunction.hovered{ border-color: #e3b341; background: #3a2a00; box-shadow: 0 0 0 1px #e3b341; }
+    .word-btn.grp-adjective  { border-color: #6a1a1a; background: #2a0f0f; }
+    .word-btn.grp-adjective.hovered  { border-color: #f85149; background: #3a1515; box-shadow: 0 0 0 1px #f85149; }
+    .word-btn.grp-adverb     { border-color: #0a4a4a; background: #081e1e; }
+    .word-btn.grp-adverb.hovered     { border-color: #39c5c5; background: #0f2e2e; box-shadow: 0 0 0 1px #39c5c5; }
+    .word-btn.grp-question   { border-color: #4a3a00; background: #1e1800; }
+    .word-btn.grp-question.hovered   { border-color: #f0a500; background: #2e2400; box-shadow: 0 0 0 1px #f0a500; }
 
     /* ── VIRTUAL CURSOR ───────────────────────────── */
     #cursor {
@@ -421,8 +437,8 @@
           <input type="range" id="blink-slider" min="0.15" max="0.30" step="0.01" value="0.21">
         </div>
         <div class="slider-row">
-          <div class="slider-label"><span>Cursor Sensitivity</span><span id="sens-val">3.0</span></div>
-          <input type="range" id="sens-slider" min="0.5" max="10.0" step="0.1" value="3.0">
+          <div class="slider-label"><span>Cursor Sensitivity</span><span id="sens-val">4.0</span></div>
+          <input type="range" id="sens-slider" min="0.5" max="10.0" step="0.1" value="4.0">
         </div>
         <div class="slider-row">
           <div class="slider-label"><span>Smoothing</span><span id="smooth-val">0.35</span></div>
@@ -459,16 +475,15 @@ const CATEGORIES = [
     words: [
       { text: 'Yes ✓',   type: 'quick', add: 'Yes' },
       { text: 'No ✗',    type: 'quick', add: 'No' },
-      { text: 'Help!',   type: 'quick', add: 'Help!' },
       { text: 'Please',  type: 'quick', add: 'Please' },
       { text: 'Wait',    type: 'quick', add: 'Wait' },
       { text: 'Stop',    type: 'quick', add: 'Stop' },
       { text: 'Good',    type: 'quick', add: 'Good' },
       { text: 'Thanks',  type: 'quick', add: 'Thanks' },
-      { text: 'Ouch',    type: 'quick', add: 'Ouch' },
       { text: 'OK',      type: 'quick', add: 'OK' },
       { text: 'Now',     type: 'quick', add: 'Now' },
       { text: 'Not yet', type: 'quick', add: 'Not yet' },
+      { text: 'Help!',   type: 'quick', add: 'Help!' },
     ]
   },
   {
@@ -476,7 +491,7 @@ const CATEGORIES = [
     words: [
       { text: 'Dude',         add: 'Dude' },
       { text: 'Holmes',       add: 'Holmes' },
-      { text: 'Tender.',      add: 'Tender.' },
+      { text: 'Tender',      add: 'Tender' },
       { text: 'Surly',        add: 'surly' },
       { text: 'Hell yes',     add: 'Hell yes!' },
       { text: 'No way',       add: 'No way' },
@@ -484,7 +499,7 @@ const CATEGORIES = [
       { text: 'Fuck',         add: 'Fuck' },
       { text: 'Shit',         add: 'Shit' },
       { text: 'Awesome',      add: 'Awesome' },
-      { text: 'Go Illini!',   add: 'Go Illini' },
+      { text: 'Go Illinios!',   add: 'Go Illinios' },
       { text: 'Truth be told',add: 'Truth be told' },
       { text: 'Tricksy',      add: 'tricksy' },
       { text: 'is a pussy',   add: ' is a pussy' },
@@ -493,9 +508,6 @@ const CATEGORIES = [
   {
     id: 'phrases', label: '💬 Phrases',
     words: [
-      { text: "I'm struggling",    type: 'phrase', add: "I'm struggling" },
-      { text: "Can you help me?",  type: 'phrase', add: "Can you help me?" },
-      { text: "I need a minute",   type: 'phrase', add: "I need a minute" },
       { text: "Truth be told…",    type: 'phrase', add: "Truth be told…" },
       { text: "Let's eat",         type: 'phrase', add: "Let's eat" },
       { text: "This is Jack",          type: 'phrase', add: "This is Jack" },
@@ -509,6 +521,9 @@ const CATEGORIES = [
       { text: "I'm grateful",      type: 'phrase', add: "I'm grateful" },
       { text: "I'm surly today",   type: 'phrase', add: "I'm surly today" },
       { text: "On and on…",        type: 'phrase', add: "On and on…" },
+      { text: "I'm struggling",    type: 'phrase', add: "I'm struggling" },
+      { text: "Can you help me?",  type: 'phrase', add: "Can you help me?" },
+      { text: "I need a minute",   type: 'phrase', add: "I need a minute" },
     ]
   },
   {
@@ -519,9 +534,12 @@ const CATEGORIES = [
       { text: 'Mark',       type: 'person', add: 'Mark' },
       { text: 'Dan',        type: 'person', add: 'Dan' },
       { text: 'Mike',       type: 'person', add: 'Mike' },
-      { text: 'Mike',       type: 'person', add: 'Mike' },
       { text: 'Wayne',       type: 'person', add: 'Wayne' },
       { text: 'Danai',      type: 'person', add: 'Danai' },
+      { text: 'Ning',       type: 'person', add: 'Nigh' },
+      { text: 'Arlyn',       type: 'person', add: 'Arlyn' },
+      { text: 'Amy',        type: 'person', add: 'Amy' },
+      { text: 'Amanda',     type: 'person', add: 'Amanda' },
       { text: 'Dude',       type: 'person', add: 'Dude' },
       { text: 'Holmes',     type: 'person', add: 'Holmes' },
       { text: 'Everyone',   type: 'person', add: 'Everyone' },
@@ -547,9 +565,9 @@ const CATEGORIES = [
   {
     id: 'needs', label: '🏥 Needs',
     words: [
-      { text: 'Water 💧',      add: 'Water please' },
+      { text: 'Water',      add: 'Water please' },
       { text: 'Coffee ☕',     add: 'Coffee please' },
-      { text: 'Food 🍜',       add: 'Food please' },
+      { text: 'Food',       add: 'Food please' },
       { text: 'Bathroom',      add: 'I need the bathroom' },
       { text: 'Reposition',    add: 'Can you reposition me?' },
       { text: 'Too hot',       add: "I'm too hot" },
@@ -564,34 +582,119 @@ const CATEGORIES = [
   {
     id: 'words', label: '🔤 Words',
     words: [
-      { text: 'I',       add: 'I' },
-      { text: "I'm",     add: "I'm" },
-      { text: 'want',    add: 'want' },
-      { text: 'need',    add: 'need' },
-      { text: 'like',    add: 'like' },
-      { text: 'think',   add: 'think' },
-      { text: 'feel',    add: 'feel' },
-      { text: 'can',     add: 'can' },
-      { text: "can't",   add: "can't" },
-      { text: 'have',    add: 'have' },
-      { text: 'going',   add: 'going' },
-      { text: 'today',   add: 'today' },
-      { text: 'now',     add: 'now' },
-      { text: 'later',   add: 'later' },
-      { text: 'more',    add: 'more' },
-      { text: 'really',  add: 'really' },
-      { text: 'and',     add: 'and' },
-      { text: 'but',     add: 'but' },
-      { text: 'because', add: 'because' },
-      { text: 'with',    add: 'with' },
-      { text: 'my',      add: 'my' },
-      { text: 'not',     add: 'not' },
-      { text: 'very',    add: 'very' },
-      { text: 'some',    add: 'some' },
-      { text: 'that',    add: 'that' },
-      { text: 'this',    add: 'this' },
-      { text: 'Thai',    add: 'Thai' },
-      { text: 'food',    add: 'food' },
+      // Pronouns (blue)
+      { text: 'I',      add: 'I',      group: 'pronoun' },
+      { text: "I'm",    add: "I'm",    group: 'pronoun' },
+      { text: 'you',    add: 'you',    group: 'pronoun' },
+      { text: 'he',     add: 'he',     group: 'pronoun' },
+      { text: 'she',    add: 'she',    group: 'pronoun' },
+      { text: 'we',     add: 'we',     group: 'pronoun' },
+      { text: 'they',   add: 'they',   group: 'pronoun' },
+      { text: 'it',     add: 'it',     group: 'pronoun' },
+      { text: 'me',     add: 'me',     group: 'pronoun' },
+      { text: 'him',    add: 'him',    group: 'pronoun' },
+      { text: 'her',    add: 'her',    group: 'pronoun' },
+      { text: 'us',     add: 'us',     group: 'pronoun' },
+      { text: 'them',   add: 'them',   group: 'pronoun' },
+      // Articles & determiners (pronoun group — same blue)
+      { text: 'the',    add: 'the',    group: 'pronoun' },
+      { text: 'a',      add: 'a',      group: 'pronoun' },
+      { text: 'an',     add: 'an',     group: 'pronoun' },
+      { text: 'this',   add: 'this',   group: 'pronoun' },
+      { text: 'that',   add: 'that',   group: 'pronoun' },
+      { text: 'these',  add: 'these',  group: 'pronoun' },
+      { text: 'those',  add: 'those',  group: 'pronoun' },
+      // To be + common verbs (green)
+      { text: 'am',     add: 'am',     group: 'verb' },
+      { text: 'is',     add: 'is',     group: 'verb' },
+      { text: 'are',    add: 'are',    group: 'verb' },
+      { text: 'was',    add: 'was',    group: 'verb' },
+      { text: 'were',   add: 'were',   group: 'verb' },
+      { text: 'be',     add: 'be',     group: 'verb' },
+      { text: 'been',   add: 'been',   group: 'verb' },
+      { text: 'have',   add: 'have',   group: 'verb' },
+      { text: 'has',    add: 'has',    group: 'verb' },
+      { text: 'had',    add: 'had',    group: 'verb' },
+      { text: 'do',     add: 'do',     group: 'verb' },
+      { text: 'did',    add: 'did',    group: 'verb' },
+      { text: 'will',   add: 'will',   group: 'verb' },
+      { text: 'would',  add: 'would',  group: 'verb' },
+      { text: 'can',    add: 'can',    group: 'verb' },
+      { text: "can't",  add: "can't",  group: 'verb' },
+      { text: 'could',  add: 'could',  group: 'verb' },
+      { text: 'should', add: 'should', group: 'verb' },
+      { text: 'may',    add: 'may',    group: 'verb' },
+      { text: 'might',  add: 'might',  group: 'verb' },
+      { text: 'get',    add: 'get',    group: 'verb' },
+      { text: 'got',    add: 'got',    group: 'verb' },
+      { text: 'go',     add: 'go',     group: 'verb' },
+      { text: 'going',  add: 'going',  group: 'verb' },
+      { text: 'know',   add: 'know',   group: 'verb' },
+      { text: 'think',  add: 'think',  group: 'verb' },
+      { text: 'want',   add: 'want',   group: 'verb' },
+      { text: 'need',   add: 'need',   group: 'verb' },
+      { text: 'like',   add: 'like',   group: 'verb' },
+      { text: 'feel',   add: 'feel',   group: 'verb' },
+      { text: 'see',    add: 'see',    group: 'verb' },
+      { text: 'say',    add: 'say',    group: 'verb' },
+      { text: 'come',   add: 'come',   group: 'verb' },
+      { text: 'make',   add: 'make',   group: 'verb' },
+      // Prepositions (purple)
+      { text: 'in',     add: 'in',     group: 'preposition' },
+      { text: 'on',     add: 'on',     group: 'preposition' },
+      { text: 'at',     add: 'at',     group: 'preposition' },
+      { text: 'to',     add: 'to',     group: 'preposition' },
+      { text: 'for',    add: 'for',    group: 'preposition' },
+      { text: 'of',     add: 'of',     group: 'preposition' },
+      { text: 'with',   add: 'with',   group: 'preposition' },
+      { text: 'from',   add: 'from',   group: 'preposition' },
+      { text: 'by',     add: 'by',     group: 'preposition' },
+      { text: 'about',  add: 'about',  group: 'preposition' },
+      { text: 'up',     add: 'up',     group: 'preposition' },
+      { text: 'out',    add: 'out',    group: 'preposition' },
+      { text: 'into',   add: 'into',   group: 'preposition' },
+      // Conjunctions (amber)
+      { text: 'and',    add: 'and',    group: 'conjunction' },
+      { text: 'but',    add: 'but',    group: 'conjunction' },
+      { text: 'or',     add: 'or',     group: 'conjunction' },
+      { text: 'so',     add: 'so',     group: 'conjunction' },
+      { text: 'because',add: 'because',group: 'conjunction' },
+      { text: 'if',     add: 'if',     group: 'conjunction' },
+      { text: 'when',   add: 'when',   group: 'conjunction' },
+      { text: 'than',   add: 'than',   group: 'conjunction' },
+      // Adverbs (teal)
+      { text: 'not',    add: 'not',    group: 'adverb' },
+      { text: 'just',   add: 'just',   group: 'adverb' },
+      { text: 'more',   add: 'more',   group: 'adverb' },
+      { text: 'very',   add: 'very',   group: 'adverb' },
+      { text: 'really', add: 'really', group: 'adverb' },
+      { text: 'now',    add: 'now',    group: 'adverb' },
+      { text: 'here',   add: 'here',   group: 'adverb' },
+      { text: 'there',  add: 'there',  group: 'adverb' },
+      { text: 'then',   add: 'then',   group: 'adverb' },
+      { text: 'also',   add: 'also',   group: 'adverb' },
+      { text: 'today',  add: 'today',  group: 'adverb' },
+      { text: 'later',  add: 'later',  group: 'adverb' },
+      // Adjectives (red)
+      { text: 'good',   add: 'good',   group: 'adjective' },
+      { text: 'great',  add: 'great',  group: 'adjective' },
+      { text: 'little', add: 'little', group: 'adjective' },
+      { text: 'new',    add: 'new',    group: 'adjective' },
+      { text: 'old',    add: 'old',    group: 'adjective' },
+      { text: 'right',  add: 'right',  group: 'adjective' },
+      { text: 'same',   add: 'same',   group: 'adjective' },
+      { text: 'some',   add: 'some',   group: 'adjective' },
+      // Question words & possessives (orange)
+      { text: 'my',     add: 'my',     group: 'question' },
+      { text: 'your',   add: 'your',   group: 'question' },
+      { text: 'his',    add: 'his',    group: 'question' },
+      { text: 'our',    add: 'our',    group: 'question' },
+      { text: 'what',   add: 'what',   group: 'question' },
+      { text: 'who',    add: 'who',    group: 'question' },
+      { text: 'how',    add: 'how',    group: 'question' },
+      // Jack's extras (default)
+      { text: 'Thai',   add: 'Thai' },
+      { text: 'food',   add: 'food' },
     ]
   },
 ];
@@ -661,7 +764,10 @@ function renderGrid() {
   if (!cat) return;
   cat.words.forEach(word => {
     const btn = document.createElement('div');
-    btn.className = 'word-btn' + (word.type ? ' ' + word.type : '');
+    let cls = 'word-btn';
+    if (word.type)  cls += ' ' + word.type;
+    if (word.group) cls += ' grp-' + word.group;
+    btn.className = cls;
     btn.textContent = word.text;
     btn.dataset.add = word.add;
     grid.appendChild(btn);
@@ -793,7 +899,7 @@ const cfg = {
   blinkMinFrames:  2,
   blinkCooldownMs: 700,
   smoothing:       0.35,
-  sensitivity:     3.0,
+  sensitivity:     4.0,
 };
 
 let baseline = null;
