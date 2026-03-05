@@ -690,12 +690,37 @@ document.getElementById('btn-clear').addEventListener('click', clearSentence);
 function copyText() {
   const text = getSentenceText();
   if (!text) return;
-  navigator.clipboard.writeText(text).then(() => {
+
+  function onSuccess() {
     const btn = document.getElementById('btn-copy');
     btn.textContent = '✓ Copied!';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
-  });
+    blinkLog.innerHTML = `<span>Copied to clipboard!</span>`;
+  }
+
+  function onFail() {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      onSuccess();
+    } catch (e) {
+      blinkLog.innerHTML = `<span style="color:var(--red)">Copy failed — try selecting manually</span>`;
+    }
+    document.body.removeChild(ta);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
+  } else {
+    onFail();
+  }
 }
 
 // ── Speech / Click feedback ──────────────────────
