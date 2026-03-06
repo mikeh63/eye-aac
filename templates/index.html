@@ -259,6 +259,103 @@
       min-height: 0;
     }
 
+    /* ── CALCULATOR ───────────────────────────────── */
+    .calc-panel {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      padding: 12px;
+      gap: 10px;
+      min-height: 0;
+    }
+    .calc-panel.active { display: flex; }
+
+    .calc-display {
+      background: #0a0e14;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      text-align: right;
+      font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+    }
+    .calc-expression {
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 1.2em;
+      word-break: break-all;
+    }
+    .calc-current {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      word-break: break-all;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      flex: 1;
+    }
+
+    .calc-btn {
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Atkinson Hyperlegible', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: default;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: all 0.12s;
+      position: relative;
+    }
+    .calc-btn.hovered {
+      border-color: var(--accent);
+      background: var(--word-hover);
+      transform: scale(1.04);
+      box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(88,166,255,0.2);
+    }
+    .calc-btn.activated {
+      transform: scale(0.94);
+      border-color: var(--green);
+      background: #152a1e;
+    }
+    .calc-btn.operator {
+      background: #1e2a3a;
+      border-color: #2a4a6a;
+      color: var(--accent);
+    }
+    .calc-btn.operator.hovered {
+      border-color: var(--accent);
+      background: #1a3050;
+    }
+    .calc-btn.action {
+      background: #1e1a2a;
+      border-color: #3a2a5a;
+      color: #b07aff;
+    }
+    .calc-btn.action.hovered {
+      border-color: #b07aff;
+      background: #2d1e4a;
+    }
+    .calc-btn.equals {
+      background: #1a3a28;
+      border-color: var(--green);
+      color: var(--green);
+      font-size: 1.8rem;
+    }
+    .calc-btn.equals.hovered {
+      background: #1f4a32;
+      box-shadow: 0 0 0 1px var(--green), 0 4px 14px rgba(63,185,80,0.3);
+    }
+
     /* ── AI PREDICTION BAR ────────────────────────── */
     .predict-bar {
       display: flex;
@@ -528,6 +625,41 @@
         <div class="predict-btn loading" id="p5">…</div>
       </div>
       <div class="word-grid" id="word-grid"></div>
+
+      <!-- ── CALCULATOR PANEL ── -->
+      <div class="calc-panel" id="calc-panel">
+        <div class="calc-display">
+          <div class="calc-expression" id="calc-expression"></div>
+          <div class="calc-current" id="calc-current">0</div>
+        </div>
+        <div class="calc-grid" id="calc-grid">
+          <!-- Row 1 -->
+          <div class="calc-btn action"    data-calc="backspace">⌫</div>
+          <div class="calc-btn action"    data-calc="clear">AC</div>
+          <div class="calc-btn operator"  data-calc="%">%</div>
+          <div class="calc-btn operator"  data-calc="÷">÷</div>
+          <!-- Row 2 -->
+          <div class="calc-btn"           data-calc="7">7</div>
+          <div class="calc-btn"           data-calc="8">8</div>
+          <div class="calc-btn"           data-calc="9">9</div>
+          <div class="calc-btn operator"  data-calc="×">×</div>
+          <!-- Row 3 -->
+          <div class="calc-btn"           data-calc="4">4</div>
+          <div class="calc-btn"           data-calc="5">5</div>
+          <div class="calc-btn"           data-calc="6">6</div>
+          <div class="calc-btn operator"  data-calc="−">−</div>
+          <!-- Row 4 -->
+          <div class="calc-btn"           data-calc="1">1</div>
+          <div class="calc-btn"           data-calc="2">2</div>
+          <div class="calc-btn"           data-calc="3">3</div>
+          <div class="calc-btn operator"  data-calc="+">+</div>
+          <!-- Row 5 -->
+          <div class="calc-btn action"    data-calc="plusminus">+/-</div>
+          <div class="calc-btn"           data-calc="0">0</div>
+          <div class="calc-btn"           data-calc=".">.</div>
+          <div class="calc-btn equals"    data-calc="=">=</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -774,19 +906,21 @@ const CATEGORIES = [
     id: 'nouns', label: '🌍 Nouns',
     words: [
       // People & relationships
-      { text: 'doctor',     add: 'doctor' },
-      { text: 'caregiver',  add: 'caregiver' },
+      { text: 'friends',     add: 'friends' },
+      { text: 'mother',   add: 'mother' },
       { text: 'family',     add: 'family' },
-      { text: 'friend',     add: 'friend' },
-      { text: 'everyone',   add: 'everyone' },
       // Places
+      { text: 'river',      add: 'river' },
+      { text: 'beach',      add: 'beach' },
       { text: 'home',       add: 'home' },
-      { text: 'hospital',   add: 'hospital' },
-      { text: 'Corvallis',  add: 'Corvallis' },
-      { text: 'Oregon',     add: 'Oregon' },
-      { text: 'outside',    add: 'outside' },
+      { text: 'view',       add: 'view' },
       { text: 'restaurant', add: 'restaurant' },
-      { text: 'coffee shop',add: 'coffee shop' },
+      { text: 'bar',        add: 'bar' },
+      { text: 'Yachats',    add: 'Yachats' },
+      { text: 'Waldport',    add: 'Waldport' },
+      { text: 'Newport',    add: 'Newport' },
+      { text: 'Mokena',    add: 'Mokena' },
+      { text: 'Chicago,     add: 'Chicago' },
       // Body & health
       { text: 'hand',       add: 'hand' },
       { text: 'arm',        add: 'arm' },
@@ -820,6 +954,10 @@ const CATEGORIES = [
       { text: 'story',      add: 'story' },
       { text: 'money',      add: 'money' },
     ]
+  },
+  {
+    id: 'calc', label: '🔢 Calc',
+    words: []
   },
 ];
 
@@ -868,6 +1006,119 @@ function renderSentence() {
 }
 
 function getSentenceText() { return words.join(' '); }
+
+// ═══════════════════════════════════════════════════
+//  CALCULATOR
+// ═══════════════════════════════════════════════════
+let calcCurrent    = '0';
+let calcExpression = '';
+let calcJustCalc   = false;  // true after = pressed
+
+function calcDisplay() {
+  document.getElementById('calc-current').textContent    = calcCurrent;
+  document.getElementById('calc-expression').textContent = calcExpression;
+}
+
+function calcPress(key) {
+  if (key === 'clear') {
+    calcCurrent    = '0';
+    calcExpression = '';
+    calcJustCalc   = false;
+
+  } else if (key === 'backspace') {
+    if (calcCurrent.length > 1) {
+      calcCurrent = calcCurrent.slice(0, -1);
+    } else {
+      calcCurrent = '0';
+    }
+    calcJustCalc = false;
+
+  } else if (key === 'plusminus') {
+    if (calcCurrent !== '0') {
+      calcCurrent = calcCurrent.startsWith('-')
+        ? calcCurrent.slice(1)
+        : '-' + calcCurrent;
+    }
+
+  } else if (key === '=') {
+    if (!calcExpression) return;
+    try {
+      // Build full expression with current value
+      const expr = calcExpression + calcCurrent;
+      // Replace display symbols with JS operators
+      const jsExpr = expr
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/−/g, '-')
+        .replace(/(\d)%/g, '($1/100)');
+      const result = Function('"use strict"; return (' + jsExpr + ')')();
+      // Format nicely — max 10 significant digits
+      calcCurrent    = parseFloat(result.toPrecision(10)).toString();
+      calcExpression = expr + ' =';
+      calcJustCalc   = true;
+    } catch(e) {
+      calcCurrent = 'Error';
+    }
+
+  } else if (['+', '−', '×', '÷'].includes(key)) {
+    calcExpression = (calcJustCalc ? calcCurrent : calcExpression + calcCurrent) + ' ' + key + ' ';
+    calcCurrent    = '0';
+    calcJustCalc   = false;
+
+  } else if (key === '%') {
+    // Apply % to current number
+    calcExpression = calcExpression + calcCurrent + '%';
+    calcCurrent    = '0';
+    calcJustCalc   = false;
+
+  } else if (key === '.') {
+    if (calcJustCalc) { calcCurrent = '0.'; calcJustCalc = false; return; }
+    if (!calcCurrent.includes('.')) calcCurrent += '.';
+
+  } else {
+    // Digit
+    if (calcJustCalc || calcCurrent === '0') {
+      calcCurrent  = key;
+      calcJustCalc = false;
+    } else {
+      if (calcCurrent.replace('-', '').length < 12) calcCurrent += key;
+    }
+  }
+  calcDisplay();
+}
+
+// Send calculator result to sentence
+function calcAddToSentence() {
+  const val = calcCurrent;
+  if (!val || val === '0' || val === 'Error') return;
+  addWord(val);
+  // Flash the display
+  document.getElementById('calc-current').style.color = 'var(--green)';
+  setTimeout(() => {
+    document.getElementById('calc-current').style.color = '';
+  }, 400);
+  // Reset calculator
+  calcCurrent    = '0';
+  calcExpression = '';
+  calcJustCalc   = false;
+  calcDisplay();
+}
+
+// Mouse clicks on calc buttons
+document.getElementById('calc-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.calc-btn');
+  if (!btn) return;
+  const key = btn.dataset.calc;
+  if (key === '=') {
+    calcPress('=');
+    // After = , clicking = again adds to sentence
+    if (calcJustCalc) calcAddToSentence();
+  } else {
+    calcPress(key);
+  }
+  btn.classList.add('activated');
+  setTimeout(() => btn.classList.remove('activated'), 200);
+});
 
 // ═══════════════════════════════════════════════════
 //  AI PREDICTION
@@ -944,7 +1195,18 @@ function renderTabs() {
 }
 
 function renderGrid() {
-  const grid = document.getElementById('word-grid');
+  const grid      = document.getElementById('word-grid');
+  const calcPanel = document.getElementById('calc-panel');
+  const predictBar = document.getElementById('predict-bar');
+  const isCalc    = activeCategory === 'calc';
+
+  // Toggle calc vs word grid
+  grid.style.display      = isCalc ? 'none' : '';
+  calcPanel.classList.toggle('active', isCalc);
+  predictBar.style.display = isCalc ? 'none' : '';
+
+  if (isCalc) return;
+
   grid.innerHTML = '';
   const cat = CATEGORIES.find(c => c.id === activeCategory);
   if (!cat) return;
@@ -1132,6 +1394,12 @@ function getHit(px, py) {
     if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
       return { type: 'word', el: btn };
   }
+  // Calculator buttons
+  for (const btn of document.querySelectorAll('.calc-btn')) {
+    const r = btn.getBoundingClientRect();
+    if (px >= r.left && px <= r.right && py >= r.top && py <= r.bottom)
+      return { type: 'calc', el: btn };
+  }
   // Prediction buttons
   for (const btn of document.querySelectorAll('.predict-btn')) {
     if (!btn.dataset.add) continue;
@@ -1175,6 +1443,17 @@ function onBlink(px, py) {
     setTimeout(() => hit.el.classList.remove('activated'), 500);
     addWord(w);
     blinkLog.innerHTML = `Added: <span>${w}</span>`;
+  } else if (hit.type === 'calc') {
+    const key = hit.el.dataset.calc;
+    hit.el.classList.add('activated');
+    setTimeout(() => hit.el.classList.remove('activated'), 200);
+    if (key === '=' && calcJustCalc) {
+      calcAddToSentence();
+      blinkLog.innerHTML = `Added: <span>${calcCurrent}</span>`;
+    } else {
+      calcPress(key);
+      blinkLog.innerHTML = `Calc: <span>${key}</span>`;
+    }
   } else if (hit.type === 'predict') {
     const w = hit.el.dataset.add;
     if (!w) return;
@@ -1246,6 +1525,10 @@ function processResults(results) {
     cursorEl.style.top  = py + 'px';
 
     document.querySelectorAll('.word-btn').forEach(btn => {
+      const r = btn.getBoundingClientRect();
+      btn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
+    });
+    document.querySelectorAll('.calc-btn').forEach(btn => {
       const r = btn.getBoundingClientRect();
       btn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
     });
