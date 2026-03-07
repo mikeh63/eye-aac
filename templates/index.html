@@ -356,6 +356,30 @@
       box-shadow: 0 0 0 1px var(--green), 0 4px 14px rgba(63,185,80,0.3);
     }
 
+    .calc-add-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--green);
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #000;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .calc-add-btn:hover { filter: brightness(1.15); }
+    .calc-add-btn.hovered {
+      filter: brightness(1.2);
+      box-shadow: 0 0 0 2px var(--green), 0 4px 14px rgba(63,185,80,0.3);
+    }
+    .calc-add-btn.activated {
+      background: #1a5c2a;
+      color: var(--green);
+    }
+
     /* ── AI PREDICTION BAR ────────────────────────── */
     .predict-bar {
       display: flex;
@@ -632,6 +656,7 @@
           <div class="calc-expression" id="calc-expression"></div>
           <div class="calc-current" id="calc-current">0</div>
         </div>
+        <button class="calc-add-btn" id="calc-add-btn">➕ Add to Sentence</button>
         <div class="calc-grid" id="calc-grid">
           <!-- Row 1 -->
           <div class="calc-btn action"    data-calc="backspace">⌫</div>
@@ -1043,16 +1068,14 @@ function calcPress(key) {
   } else if (key === '=') {
     if (!calcExpression) return;
     try {
-      // Build full expression with current value
       const expr = calcExpression + calcCurrent;
-      // Replace display symbols with JS operators
       const jsExpr = expr
         .replace(/×/g, '*')
         .replace(/÷/g, '/')
         .replace(/−/g, '-')
-        .replace(/(\d)%/g, '($1/100)');
+        .replace(/(\d)%/g, '($1/100)')
+        .replace(/([\s\*\/\+\-])\./g, '$10.');
       const result = Function('"use strict"; return (' + jsExpr + ')')();
-      // Format nicely — max 10 significant digits
       calcCurrent    = parseFloat(result.toPrecision(10)).toString();
       calcExpression = expr + ' =';
       calcJustCalc   = true;
@@ -1066,14 +1089,19 @@ function calcPress(key) {
     calcJustCalc   = false;
 
   } else if (key === '%') {
-    // Apply % to current number
-    calcExpression = calcExpression + calcCurrent + '%';
-    calcCurrent    = '0';
-    calcJustCalc   = false;
+    const val = parseFloat(calcCurrent);
+    if (!isNaN(val)) {
+      calcCurrent = parseFloat((val / 100).toPrecision(10)).toString();
+    }
 
   } else if (key === '.') {
-    if (calcJustCalc) { calcCurrent = '0.'; calcJustCalc = false; return; }
-    if (!calcCurrent.includes('.')) calcCurrent += '.';
+      if (calcJustCalc || calcCurrent === '0') {
+        calcCurrent = '0.';
+        calcJustCalc = false;
+        calcDisplay();
+        return;
+      }
+      if (!calcCurrent.includes('.')) calcCurrent += '.';
 
   } else {
     // Digit
@@ -1109,15 +1137,13 @@ document.getElementById('calc-grid').addEventListener('click', e => {
   const btn = e.target.closest('.calc-btn');
   if (!btn) return;
   const key = btn.dataset.calc;
-  if (key === '=') {
-    calcPress('=');
-    // After = , clicking = again adds to sentence
-    if (calcJustCalc) calcAddToSentence();
-  } else {
-    calcPress(key);
-  }
+  calcPress(key);
   btn.classList.add('activated');
   setTimeout(() => btn.classList.remove('activated'), 200);
+});
+
+document.getElementById('calc-add-btn').addEventListener('click', () => {
+  calcAddToSentence();
 });
 
 // ═══════════════════════════════════════════════════
@@ -1419,6 +1445,7 @@ function getHit(px, py) {
     { id: 'btn-calibrate', type: 'calibrate' },
     { id: 'btn-speak',     type: 'speak' },
     { id: 'btn-play',      type: 'play' },
+    { id: 'calc-add-btn',  type: 'calc-add' },
   ];
   for (const { id, type } of actions) {
     const el = document.getElementById(id);
@@ -1447,13 +1474,8 @@ function onBlink(px, py) {
     const key = hit.el.dataset.calc;
     hit.el.classList.add('activated');
     setTimeout(() => hit.el.classList.remove('activated'), 200);
-    if (key === '=' && calcJustCalc) {
-      calcAddToSentence();
-      blinkLog.innerHTML = `Added: <span>${calcCurrent}</span>`;
-    } else {
-      calcPress(key);
-      blinkLog.innerHTML = `Calc: <span>${key}</span>`;
-    }
+    calcPress(key);
+    blinkLog.innerHTML = `Calc: <span>${key}</span>`;
   } else if (hit.type === 'predict') {
     const w = hit.el.dataset.add;
     if (!w) return;
@@ -1471,6 +1493,12 @@ function onBlink(px, py) {
   else if (hit.type === 'calibrate')   { doCalibrate(); }
   else if (hit.type === 'play')        { playSentence(); blinkLog.innerHTML = `<span>Playing…</span>`; }
   else if (hit.type === 'speak')       { btnSpeak.click(); }
+  else if (hit.type === 'calc-add')    {
+    hit.el.classList.add('activated');
+    setTimeout(() => hit.el.classList.remove('activated'), 400);
+    calcAddToSentence();
+    blinkLog.innerHTML = `Added: <span>${calcCurrent}</span>`;
+  }
 }
 
 function doCalibrate() {
@@ -1532,6 +1560,11 @@ function processResults(results) {
       const r = btn.getBoundingClientRect();
       btn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
     });
+    const calcAddBtn = document.getElementById('calc-add-btn');
+    if (calcAddBtn) {
+      const r = calcAddBtn.getBoundingClientRect();
+      calcAddBtn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);
+    }
     document.querySelectorAll('.predict-btn').forEach(btn => {
       const r = btn.getBoundingClientRect();
       btn.classList.toggle('hovered', px >= r.left && px <= r.right && py >= r.top && py <= r.bottom);

@@ -6,7 +6,9 @@ from flask import Flask, render_template, jsonify, request
 app = Flask(__name__)
 
 # Anthropic client — reads ANTHROPIC_API_KEY from environment
-client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+api_key = os.environ.get("ANTHROPIC_API_KEY")
+client = anthropic.Anthropic(api_key=api_key) if api_key else None
+#client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 JACK_SYSTEM_PROMPT = """You are helping Jack, a witty and irreverent man with ALS who uses an AAC 
 (Augmentative and Alternative Communication) board to communicate. Jack has a sharp sense of humor, 
@@ -37,6 +39,9 @@ def index():
 def predict():
     data = request.get_json()
     sentence = data.get("sentence", "").strip()
+
+    if not client:
+        return jsonify({"suggestions": ["no", "api", "key", "set", "", ""]})
 
     if not sentence:
         return jsonify({"suggestions": []})
