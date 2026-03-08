@@ -11,4 +11,4 @@ env/
 .venv/
 
 # OS files
-.DS_Store
+.DS_Storeclaude-api-key.txt
