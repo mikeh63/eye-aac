@@ -190,6 +190,7 @@
     .cam-btn-primary:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
     .cam-btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); font-size: 0.82rem; }
     .cam-btn-secondary:hover { border-color: var(--accent); }
+    .cam-btn-secondary.active { background: #1a3a28; border-color: var(--green); color: var(--green); }
 
     .sliders { display: flex; flex-direction: column; gap: 7px; }
     .slider-row { display: flex; flex-direction: column; gap: 2px; }
@@ -612,6 +613,9 @@
       </button>
       <button class="cam-btn cam-btn-secondary" id="btn-debug">
         🐛 Debug overlay
+      </button>
+      <button class="cam-btn cam-btn-secondary" id="btn-touchmode">
+        👆 Touch Mode: Off
       </button>
 
       <div class="sliders">
@@ -1618,6 +1622,25 @@ btnCal.addEventListener('click', doCalibrate);
 document.getElementById('btn-debug').addEventListener('click', () => {
   showDebug = !showDebug;
   if (!showDebug) dctx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+});
+
+let touchMode = false;
+document.getElementById('btn-touchmode').addEventListener('click', () => {
+  touchMode = !touchMode;
+  const btn = document.getElementById('btn-touchmode');
+  if (touchMode) {
+    mpCamera.stop();
+    cursorEl.style.display = 'none';
+    btn.textContent = '👆 Touch Mode: On';
+    btn.classList.add('active');
+    setStatus('Touch mode — camera off', 'green');
+  } else {
+    cursorEl.style.display = '';
+    btn.textContent = '👆 Touch Mode: Off';
+    btn.classList.remove('active');
+    setStatus('Restarting camera…', 'amber');
+    mpCamera.start().then(() => setStatus('Tracking active', 'green'));
+  }
 });
 document.getElementById('blink-slider').addEventListener('input', e => {
   cfg.blinkThreshold = +e.target.value;
